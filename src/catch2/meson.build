@@ -18,6 +18,8 @@ configure_file(
   configuration: conf_data,
 )
 
+fs = import('fs')
+
 benchmark_headers = [
   'benchmark/catch_benchmark.hpp',
   'benchmark/catch_benchmark_all.hpp',
@@ -72,13 +74,13 @@ internal_headers = [
   'interfaces/catch_interfaces_testcase.hpp',
   'internal/catch_assertion_handler.hpp',
   'internal/catch_case_insensitive_comparisons.hpp',
-  'internal/catch_case_sensitive.hpp',
   'internal/catch_clara.hpp',
   'internal/catch_commandline.hpp',
   'internal/catch_compare_traits.hpp',
   'internal/catch_compiler_capabilities.hpp',
   'internal/catch_config_android_logwrite.hpp',
   'internal/catch_config_counter.hpp',
+  'internal/catch_config_prefix_messages.hpp',
   'internal/catch_config_static_analysis_support.hpp',
   'internal/catch_config_uncaught_exceptions.hpp',
   'internal/catch_config_wchar.hpp',
@@ -171,6 +173,7 @@ internal_headers = [
   'catch_approx.hpp',
   'catch_assertion_info.hpp',
   'catch_assertion_result.hpp',
+  'catch_case_sensitive.hpp',
   'catch_config.hpp',
   'catch_get_random_seed.hpp',
   'catch_message.hpp',
@@ -231,7 +234,6 @@ internal_sources = files(
   'internal/catch_random_seed_generation.cpp',
   'internal/catch_reporter_registry.cpp',
   'internal/catch_reporter_spec_parser.cpp',
-  'internal/catch_result_type.cpp',
   'internal/catch_reusable_string_stream.cpp',
   'internal/catch_run_context.cpp',
   'internal/catch_section.cpp',
@@ -340,9 +342,19 @@ foreach file : headers
   install_headers(file, subdir: join_paths(include_subdir, folder))
 endforeach
 
+catch2_dependencies = []
+# Check if this is an Android NDK build.
+if ((host_machine.system() == 'android') or
+  # Check if this is an Android Termux build.
+  (host_machine.system() == 'linux' and fs.is_dir('/data/data/com.termux')))
+  log_dep = meson.get_compiler('cpp').find_library('log')
+  catch2_dependencies += log_dep
+endif
+
 catch2 = static_library(
   'Catch2',
   sources,
+  dependencies: catch2_dependencies,
   include_directories: '..',
   install: true,
 )

@@ -11,6 +11,7 @@ endif()
 option(CATCH_INSTALL_DOCS "Install documentation alongside library" ON)
 option(CATCH_INSTALL_EXTRAS "Install extras (CMake scripts, debugger helpers) alongside library" ON)
 option(CATCH_DEVELOPMENT_BUILD "Build tests, enable warnings, enable Werror, etc" OFF)
+option(CATCH_ENABLE_REPRODUCIBLE_BUILD "Add compiler flags for improving build reproducibility" ON)
 
 include(CMakeDependentOption)
 cmake_dependent_option(CATCH_BUILD_TESTING "Build the SelfTest project" ON "CATCH_DEVELOPMENT_BUILD" OFF)
@@ -32,7 +33,7 @@ if (CMAKE_BINARY_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
 endif()
 
 project(Catch2
-  VERSION 3.5.0 # CML version placeholder, don't delete
+  VERSION 3.7.1 # CML version placeholder, don't delete
   LANGUAGES CXX
   # HOMEPAGE_URL is not supported until CMake version 3.12, which
   # we do not target yet.
@@ -75,8 +76,6 @@ endif()
 set(CATCH_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(SOURCES_DIR ${CATCH_DIR}/src/catch2)
 set(SELF_TEST_DIR ${CATCH_DIR}/tests/SelfTest)
-set(BENCHMARK_DIR ${CATCH_DIR}/tests/Benchmark)
-set(EXAMPLES_DIR ${CATCH_DIR}/examples)
 
 # We need to bring-in the variables defined there to this scope
 add_subdirectory(src)
@@ -199,4 +198,4 @@ if (NOT_SUBPROJECT)
 
     include( CPack )
 
-endif(NOT_SUBPROJECT)
+endif()
